@@ -1,3 +1,5 @@
+const Customer = require('../models/Customer');
+
 exports.config = async(req, res) =>{
      const VERIFY_TOKEN = process.env.WH_TOKEN;
 
@@ -20,8 +22,6 @@ exports.config = async(req, res) =>{
 exports.handleMessage = async(req, res)=>{
   const body = req.body;
 
-  console.log('Webhook POST body:', JSON.stringify(body, null, 2));
-
   // Example: Extract message text
   if (
     body.object === 'whatsapp_business_account' &&
@@ -33,12 +33,25 @@ exports.handleMessage = async(req, res)=>{
     const from = message.from; // phone number of sender
     const msgBody = message.text?.body; // message content
     const name = body.entry[0].changes[0].value.contacts[0].profile.name; // sender's name if available
-
+    
+    const customer ={
+      name:name,
+      PhoneNo:from
+    }
    
-
-
-    console.log(`🔔 New message from ${from}: ${msgBody}`);
+    await insertCustomer(customer);
   }
 
   res.sendStatus(200);
 };
+
+const insertCustomer = async(customer) =>
+{
+  try {
+    await Customer.create(customer);
+    // res.status(201).json({'message':'successfully added '});
+  } catch (error) {
+    // res.status(500).json({ error: 'Failed to create add customer' });
+  }
+    
+}

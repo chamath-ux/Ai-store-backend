@@ -19,6 +19,11 @@ const Order = sequelize.define('Order', {
 
 // Optional: define association
 Customer.hasMany(Order, { foreignKey: 'cusId' });
-Order.belongsTo(User, { foreignKey: 'cusId' });
+Order.belongsTo(Customer, { foreignKey: 'cusId' });
+
+ Order.afterCreate(async (order, options) => {
+    console.log(`Order ${order.id} created!`);
+    // You can trigger webhook or notification here
+  });
 
 module.exports = Order;
